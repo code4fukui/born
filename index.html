@@ -1,60 +1,80 @@
 <!DOCTYPE html><html><head><meta charset="utf-8">
 <title>梵 - born - </title>
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
-<meta property="og:image" content="icon2.png">
+<meta property="og:image" content="ss.jpg">
 <link rel="apple-touch-icon" href="icon2.png">
 <script src="fukuno.js"></script>
-<script src="data-born.json"></script>
 <script>"use strict";
 
 window.onload = function() {
-//	dump(DATA_BORN);
-	var items = DATA_BORN.data;
-	var c = main;
-	shuffle(items);
-	
-	var hash = decodeURIComponent(document.location.hash);
-	if (hash.length > 1) {
-		hash = hash.substring(1);
-	}
-	for (var i = 0; i < items.length; i++) {
-		if (items[i].name == hash) {
+	getJSON("data-born.json", function(data) {
+//		dump(data);
+		var items = data.data;
+		var c = main;
+		shuffle(items);
+		
+		var hash = decodeURIComponent(document.location.hash);
+		if (hash.length > 1) {
+			hash = hash.substring(1);
+		}
+		for (var i = 0; i < items.length; i++) {
+			if (items[i].name == hash) {
+				var item = items[i];
+				items.splice(i, 1);
+				items.unshift(item);
+				break;
+			}
+		}
+		
+		for (var i = 0; i < items.length; i++) {
 			var item = items[i];
-			items.splice(i, 1);
-			items.unshift(item);
-			break;
-		}
-	}
-	
-	for (var i = 0; i < items.length; i++) {
-		var item = items[i];
-		var div = create("div");
-		div.className = "item";
-		var img = item.url;
-		div.style.backgroundImage = "url(" + img + ")";
-		var cc = create("div");
-		
-		var d2 = create("div");
-		d2.className = "name";
-		d2.textContent = item.name;
-		d2.onclick = function() {
-			document.location.hash = encodeURIComponent(this.textContent);
-		};
-		div.appendChild(d2);
-		
-		cc.className = "c";
-		var head = [ "info", "money", "award" ];
-		for (var j = 0; j < head.length; j++) {
-			var h = head[j];
+			var div = create("div");
+			div.className = "item";
+			var img = item.url;
+			div.style.backgroundImage = "url(" + img + ")";
+			var cc = create("div");
+			
 			var d2 = create("div");
-			d2.className = h;
-			d2.textContent = item[h];
-			cc.appendChild(d2);
+			d2.className = "name";
+			d2.textContent = item.name;
+			d2.onclick = function() {
+				document.location.hash = encodeURIComponent(this.textContent);
+			};
+			div.appendChild(d2);
+			
+			cc.className = "c";
+			var head = [ "info", "money", "award" ];
+			for (var j = 0; j < head.length; j++) {
+				var h = head[j];
+				var d2 = create("div");
+				d2.className = h;
+				d2.innerHTML = item[h].replace(/\n/g, "<br>");
+				cc.appendChild(d2);
+			}
+			div.appendChild(cc);
+			c.appendChild(div);
 		}
-		div.appendChild(cc);
-		c.appendChild(div);
-	}
+	});
 };
+
+var getJSON = function(url, callback) {
+	var data = "";
+	var method = "GET";
+	var async = true;
+	var xhr = getXHR();
+	xhr.open(method, url, async);
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+		alert(xhr.responseText);
+			var res = JSON.parse(xhr.responseText);
+//			var res = xhr.responseXML;
+			callback(res);
+		}
+	};
+	xhr.setRequestHeader("If-Modified-Since", "Thu, 01 Jun 1970 00:00:00 GMT");
+	xhr.send(data);
+};
+
 </script>
 <style>
 body {
@@ -107,7 +127,7 @@ a {
 
 <div id=src>
 	DATA: <a href=data-born.json>梵 日本酒オープンデータ</a> <a href=https://creativecommons.org/licenses/by/4.0/deed.ja>CC BY</a> <a href=http://www.born.co.jp/>梵</a><br>
-	APP: CC BY <a href=http://fukuno.jig.jp/ target=_blank>福野泰介の一日一創</a><br>
+	APP: CC BY <a href=http://fukuno.jig.jp/ target=_blank>福野泰介の一日一創</a> (<a href=https://github.com/codeforfukui/born>src on GitHub</a>)<br>
 </div>
 
 </body>

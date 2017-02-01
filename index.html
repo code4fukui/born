@@ -1,0 +1,114 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>梵 - born - </title>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+<meta property="og:image" content="icon2.png">
+<link rel="apple-touch-icon" href="icon2.png">
+<script src="fukuno.js"></script>
+<script src="data-born.json"></script>
+<script>"use strict";
+
+window.onload = function() {
+//	dump(DATA_BORN);
+	var items = DATA_BORN.data;
+	var c = main;
+	shuffle(items);
+	
+	var hash = decodeURIComponent(document.location.hash);
+	if (hash.length > 1) {
+		hash = hash.substring(1);
+	}
+	for (var i = 0; i < items.length; i++) {
+		if (items[i].name == hash) {
+			var item = items[i];
+			items.splice(i, 1);
+			items.unshift(item);
+			break;
+		}
+	}
+	
+	for (var i = 0; i < items.length; i++) {
+		var item = items[i];
+		var div = create("div");
+		div.className = "item";
+		var img = item.url;
+		div.style.backgroundImage = "url(" + img + ")";
+		var cc = create("div");
+		
+		var d2 = create("div");
+		d2.className = "name";
+		d2.textContent = item.name;
+		d2.onclick = function() {
+			document.location.hash = encodeURIComponent(this.textContent);
+		};
+		div.appendChild(d2);
+		
+		cc.className = "c";
+		var head = [ "info", "money", "award" ];
+		for (var j = 0; j < head.length; j++) {
+			var h = head[j];
+			var d2 = create("div");
+			d2.className = h;
+			d2.textContent = item[h];
+			cc.appendChild(d2);
+		}
+		div.appendChild(cc);
+		c.appendChild(div);
+	}
+};
+</script>
+<style>
+body {
+}
+.item {
+	height: 320px;
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+	margin: 40px 0px;
+}
+.item .name {
+	font-size: 180%;
+	font-weight: bold;
+	background-color: rgba(255, 255, 255, .8);
+	padding-top: 20px;
+	padding-left: 10%;
+}
+.item .c {
+	overflow: scroll;
+	margin-left: 30%;
+	height: 250px;
+}
+.item .info {
+	font-size: 90%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+.item .money {
+	font-size: 90%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+.item .award {
+	font-size: 80%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+#src {
+	margin: 20px;
+}
+a {
+	color: gray !important;
+}
+</style>
+</head>
+<body>
+
+<div id="main">
+</div>
+
+<div id=src>
+	DATA: <a href=data-born.json>梵 日本酒オープンデータ</a> <a href=https://creativecommons.org/licenses/by/4.0/deed.ja>CC BY</a> <a href=http://www.born.co.jp/>梵</a><br>
+	APP: CC BY <a href=http://fukuno.jig.jp/ target=_blank>福野泰介の一日一創</a><br>
+</div>
+
+</body>
+</html>

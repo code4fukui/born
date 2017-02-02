@@ -65,7 +65,6 @@ var getJSON = function(url, callback) {
 	xhr.open(method, url, async);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
-		alert(xhr.responseText);
 			var res = JSON.parse(xhr.responseText);
 //			var res = xhr.responseXML;
 			callback(res);

@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><meta charset="utf-8">
-<title>梵 - born - </title>
+<title>梵 - Born - </title>
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 <meta property="og:image" content="ss.jpg">
 <link rel="apple-touch-icon" href="icon2.png">
@@ -36,7 +36,10 @@ window.onload = function() {
 			
 			var d2 = create("div");
 			d2.className = "name";
-			d2.textContent = item.name;
+			var name = item.name;
+			if (getLanguage() != "ja" && item.name_en)
+				name = item.name_en;
+			d2.textContent = name;
 			d2.onclick = function() {
 				document.location.hash = encodeURIComponent(this.textContent);
 			};
@@ -48,7 +51,13 @@ window.onload = function() {
 				var h = head[j];
 				var d2 = create("div");
 				d2.className = h;
-				d2.innerHTML = item[h].replace(/\n/g, "<br>");
+				var s = item[h].replace(/\n/g, "<br>");
+				if (h == "money" && getLanguage() != "ja") {
+					s = s.replace(/([0-9\,]+)円/g, "¥$1");
+					
+					s = s.replace(/税/g, "Tax");
+				}
+				d2.innerHTML = s;
 				cc.appendChild(d2);
 			}
 			div.appendChild(cc);
@@ -125,8 +134,8 @@ a {
 </div>
 
 <div id=src>
-	DATA: <a href=data-born.json>梵 日本酒オープンデータ</a> <a href=https://creativecommons.org/licenses/by/4.0/deed.ja>CC BY</a> <a href=http://www.born.co.jp/>梵</a><br>
-	APP: CC BY <a href=http://fukuno.jig.jp/ target=_blank>福野泰介の一日一創</a> (<a href=https://github.com/codeforfukui/born>src on GitHub</a>)<br>
+	DATA: <a href=data-born.json>Born Sake Open Data / 梵 日本酒オープンデータ</a> <a href=https://creativecommons.org/licenses/by/4.0/deed.ja>CC BY</a> <a href=http://www.born.co.jp/>Born / 梵</a><br>
+	APP: CC BY <a href=http://fukuno.jig.jp/1703 target=_blank>福野泰介の一日一創</a> (<a href=https://github.com/codeforfukui/born>src on GitHub</a>)<br>
 </div>
 
 </body>

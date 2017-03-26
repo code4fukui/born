@@ -67,7 +67,7 @@ window.onload = function() {
 			var cc = create("div");
 			div.style.position = "absolute";
 			div.style.top = ((item.val2 - 20) / 35 * 350) + "px";
-			div.style.left = ((item.val - 3) * 4) + "%";
+			div.style.left = ((item.val - 3) * 5) + "%";
 			div.style.width = "200px";
 			div.style.height = "200px";
 			div.item = item;
@@ -88,8 +88,8 @@ window.onload = function() {
 			div.style.backgroundPosition = "center center";
 			var cc = create("div");
 			div.style.display = "inline-block";
-			div.style.width = "200px";
-			div.style.height = "200px";
+			div.style.width = "175px";
+			div.style.height = "175px";
 			div.innerHTML = item.seimai + "<br>" + addComma(item.val * 1000) + "yen/L";
 			div.item = item;
 			div.onclick = function() {
@@ -132,7 +132,7 @@ body {
 	height: 320px;
 	background-repeat: no-repeat;
 	background-size: auto 100%;
-	margin: 40px 0px;
+	margin: 0px 0px;
 }
 .item .name {
 	font-size: 180%;

@@ -90,7 +90,7 @@ window.onload = function() {
 			div.style.display = "inline-block";
 			div.style.width = "175px";
 			div.style.height = "175px";
-			div.innerHTML = item.seimai + "<br>" + addComma(item.val * 1000) + "yen/L";
+			div.innerHTML = item.seimai + "<br>" + addComma(item.val * 180) + "yen/gou";
 			div.item = item;
 			div.onclick = function() {
 				window.open("index.html#" + this.item.name);
@@ -178,7 +178,7 @@ a {
 
 <div id="main">
 </div>
-↓精米歩合/Seimai Buai (%) →単価(円/mL)
+↓精米歩合/Seimai Buai (%) →単価(円/合)/Price(yen/gou, 1gou = 180mL)
 
 <div id="list"></div>
 

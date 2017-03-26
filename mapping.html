@@ -1,0 +1,191 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>梵 mapping</title>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+<meta property="og:image" content="mapping.jpg">
+<link rel="apple-touch-icon" href="icon2.png">
+<script src="fukuno.js"></script>
+<script>"use strict";
+
+window.onload = function() {
+	getJSON("data-born.json", function(data) {
+//		dump(data);
+		var items = data.data;
+		var c = main;
+		shuffle(items);
+		
+		var parse = function(s, post) {
+			var n = s.indexOf(post);
+			var res = "";
+			for (var i = n - 1; i >= 0; i--) {
+				if ("0123456789".indexOf(s.charAt(i)) >= 0) {
+					res = s.charAt(i) + res;
+				} else {
+					break;
+				}
+			}
+			if (res == "")
+				return 0;
+			return parseInt(res);
+		}
+		for (var i = 0; i < items.length; i++) {
+			var it = items[i];
+			var s = it.money.replace(/,/g, "");
+			var amt = parse(s, "mL");
+			var amt2 = parse(s, "mLx");
+			if (amt2 != 0) {
+				amt = amt2 * 3;
+			}
+			var yen = parse(s, "円");
+			it.val = yen / amt;
+//			console.log(amt + " " + amt2 + " " + yen + " " + it.val);
+			
+			s = it.seimai;
+			var s2 = parse(s, "%+");
+			var s1 = parse(s, "%");
+			if (s2 > 0) {
+				it.val2 = s2 + s2 / 2;
+			} else if (s1 > 0) {
+				it.val2 = s1;
+			} else {
+				it.val2 = 20;
+			}
+//			console.log(it.name + " " + it.val2);
+		}
+		items.sort(function(a, b) {
+			return b.val - a.val;
+		});
+		
+		for (var i = items.length - 1; i >= 0; i--) {
+			var item = items[i];
+			var div = create("div");
+			div.className = "item";
+			var img = item.url;
+			img = img.replace(".jpg", ".png");
+			img = img.replace("images", "images_png");
+			div.style.backgroundImage = "url(" + img + ")";
+			div.style.backgroundPosition = "center center";
+			var cc = create("div");
+			div.style.position = "absolute";
+			div.style.top = ((item.val2 - 20) / 35 * 350) + "px";
+			div.style.left = ((item.val - 3) * 4) + "%";
+			div.style.width = "200px";
+			div.style.height = "200px";
+			div.item = item;
+			div.onclick = function() {
+				window.open("index.html#" + this.item.name);
+			};
+			c.appendChild(div);
+		}
+		var c2 = list;
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			var div = create("div");
+			div.className = "item";
+			var img = item.url;
+			img = img.replace(".jpg", ".png");
+			img = img.replace("images", "images_png");
+			div.style.backgroundImage = "url(" + img + ")";
+			div.style.backgroundPosition = "center center";
+			var cc = create("div");
+			div.style.display = "inline-block";
+			div.style.width = "200px";
+			div.style.height = "200px";
+			div.innerHTML = item.seimai + "<br>" + addComma(item.val * 1000) + "yen/L";
+			div.item = item;
+			div.onclick = function() {
+				window.open("index.html#" + this.item.name);
+			};
+			c2.appendChild(div);
+		}
+	});
+};
+
+var getJSON = function(url, callback) {
+	var data = "";
+	var method = "GET";
+	var async = true;
+	var xhr = getXHR();
+	xhr.open(method, url, async);
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			var res = JSON.parse(xhr.responseText);
+//			var res = xhr.responseXML;
+			callback(res);
+		}
+	};
+	xhr.setRequestHeader("If-Modified-Since", "Thu, 01 Jun 1970 00:00:00 GMT");
+	xhr.send(data);
+};
+
+</script>
+<style>
+body {
+}
+#main {
+	width: 100%;
+	height: 600px;
+}
+#list {
+	padding-top: 2em;
+}
+.item {
+	height: 320px;
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+	margin: 40px 0px;
+}
+.item .name {
+	font-size: 180%;
+	font-weight: bold;
+	background-color: rgba(255, 255, 255, .8);
+	padding-top: 20px;
+	padding-left: 10%;
+}
+.item .c {
+	overflow: scroll;
+	margin-left: 30%;
+	height: 250px;
+}
+.item .info {
+	font-size: 90%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+.item .money {
+	font-size: 90%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+.item .seimai {
+	font-size: 90%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+.item .award {
+	font-size: 80%;
+	margin: 10px;
+	background-color: rgba(255, 255, 255, .8);
+}
+#src {
+	margin: 20px;
+}
+a {
+	color: gray !important;
+}
+</style>
+</head>
+<body>
+
+<div id="main">
+</div>
+↓精米歩合/Seimai Buai (%) →単価(円/mL)
+
+<div id="list"></div>
+
+<div id=src>
+	DATA: <a href=data-born.json>Born Sake Open Data / 梵 日本酒オープンデータ</a> <a href=https://creativecommons.org/licenses/by/4.0/deed.ja>CC BY</a> <a href=http://www.born.co.jp/>Born / 梵</a><br>
+	APP: CC BY <a href=http://fukuno.jig.jp/1706 target=_blank>福野泰介の一日一創</a> (<a href=https://github.com/codeforfukui/born>src on GitHub</a>)<br>
+</div>
+
+</body>
+</html>

@@ -7,9 +7,8 @@
 <script>"use strict";
 
 window.onload = function() {
-	getJSON("data-born.json", function(data) {
-//		dump(data);
-		var items = data.data;
+	getJSON("data-born.json", function(items) {
+//		dump(items);
 		var c = main;
 		shuffle(items);
 		
@@ -18,7 +17,7 @@ window.onload = function() {
 			hash = hash.substring(1);
 		}
 		for (var i = 0; i < items.length; i++) {
-			if (items[i].name == hash || items[i].name_en == hash) {
+			if (items[i]["Name@ja"] == hash || items[i]["Name"] == hash) {
 				var item = items[i];
 				items.splice(i, 1);
 				items.unshift(item);
@@ -30,15 +29,15 @@ window.onload = function() {
 			var item = items[i];
 			var div = create("div");
 			div.className = "item";
-			var img = item.url;
+			var img = item.Photo;
 			div.style.backgroundImage = "url(" + img + ")";
 			var cc = create("div");
 			
 			var d2 = create("div");
 			d2.className = "name";
-			var name = item.name;
-			if (getLanguage() != "ja" && item.name_en)
-				name = item.name_en;
+			var name = item["Name@ja"];
+			if (getLanguage() != "ja" && item.Name)
+				name = item.Name;
 			d2.textContent = name;
 			d2.onclick = function() {
 				document.location.hash = encodeURIComponent(this.textContent);
@@ -46,17 +45,17 @@ window.onload = function() {
 			div.appendChild(d2);
 			
 			cc.className = "c";
-			var head = [ "info", "seimai", "money", "award" ];
+			var head = [ [ "info", "Info@ja" ], [ "seimai", "SeimaiBuai" ], [ "award", "Awards@ja" ] ];
 			for (var j = 0; j < head.length; j++) {
 				var h = head[j];
 				var d2 = create("div");
-				d2.className = h;
-				var s = item[h].replace(/\n/g, "<br>");
-				if (h == "money" && getLanguage() != "ja") {
-					s = s.replace(/([0-9\,]+)円/g, "¥$1");
-					s = s.replace(/税/g, "Tax");
-				}
-				if (h == "seimai") {
+				d2.className = h[0];
+				h = h[1];
+				var s = item[h];
+				if (!s)
+					s = "";
+				s = s.replace(/\n/g, "<br>");
+				if (h == "SeimaiBuai") {
 					if (getLanguage() != "ja") {
 						s = "Seimai Buai: " + s;
 					} else {
@@ -66,6 +65,25 @@ window.onload = function() {
 				d2.innerHTML = s;
 				cc.appendChild(d2);
 			}
+			// price
+			{
+				var d2 = create("div");
+				d2.className = "price";
+				var s = "";
+				for (var name in item) {
+					if (name.startsWith("Price_")) {
+						var price = item[name];
+						if (getLanguage() == "ja") {
+							s += name.substring(6) + ": " + addComma(price) + "円<br>";
+						} else {
+							s += name.substring(6) + ": " + addComma(price) + "yen<br>";
+						}
+					}
+				}
+				d2.innerHTML = s;
+				cc.appendChild(d2);
+			}
+			
 			div.appendChild(cc);
 			c.appendChild(div);
 		}
@@ -116,7 +134,7 @@ body {
 	margin: 10px;
 	background-color: rgba(255, 255, 255, .8);
 }
-.item .money {
+.item .price {
 	font-size: 90%;
 	margin: 10px;
 	background-color: rgba(255, 255, 255, .8);

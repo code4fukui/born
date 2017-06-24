@@ -7,39 +7,47 @@
 <script>"use strict";
 
 window.onload = function() {
-	getJSON("data-born.json", function(data) {
-//		dump(data);
-		var items = data.data;
+	getJSON("data-born.json", function(items) {
+//		dump(items);
 		var c = main;
 		shuffle(items);
 		
-		var parse = function(s, post) {
-			var n = s.indexOf(post);
-			var res = "";
-			for (var i = n - 1; i >= 0; i--) {
-				if ("0123456789".indexOf(s.charAt(i)) >= 0) {
-					res = s.charAt(i) + res;
-				} else {
-					break;
-				}
+		var parse = function(s, term) {
+			var n = s.indexOf(term);
+			if (n >= 0) {
+				return parseInt(s.substring(0, n));
 			}
-			if (res == "")
-				return 0;
-			return parseInt(res);
-		}
+			return 0;
+		};
 		for (var i = 0; i < items.length; i++) {
 			var it = items[i];
-			var s = it.money.replace(/,/g, "");
-			var amt = parse(s, "mL");
-			var amt2 = parse(s, "mLx");
+			
+			var amt = 0; //parse(s, "mL");
+			var amt2 = 0; //parse(s, "mLx");
+			var yen = 0;
+			for (var name in it) {
+				if (name.startsWith("Price_")) {
+					var n = name.indexOf("mLx3");
+					if (n >= 0) {
+						amt2 = parseInt(name.substring(6, n)) * 3;
+						yen = it[name];
+						break;
+					}
+					n = name.indexOf("mL");
+					if (n >= 0) {
+						amt = parseInt(name.substring(6, n));
+						yen = it[name];
+						break;
+					}
+				}
+			}
 			if (amt2 != 0) {
 				amt = amt2 * 3;
 			}
-			var yen = parse(s, "円");
 			it.val = yen / amt;
 //			console.log(amt + " " + amt2 + " " + yen + " " + it.val);
 			
-			s = it.seimai;
+			var s = it.SeimaiBuai;
 			var s2 = parse(s, "%+");
 			var s1 = parse(s, "%");
 			if (s2 > 0) {
@@ -59,9 +67,7 @@ window.onload = function() {
 			var item = items[i];
 			var div = create("div");
 			div.className = "item";
-			var img = item.url;
-			img = img.replace(".jpg", ".png");
-			img = img.replace("images", "images_png");
+			var img = item.Image;
 			div.style.backgroundImage = "url(" + img + ")";
 			div.style.backgroundPosition = "center center";
 			var cc = create("div");
@@ -72,7 +78,7 @@ window.onload = function() {
 			div.style.height = "200px";
 			div.item = item;
 			div.onclick = function() {
-				window.open("index.html#" + this.item.name);
+				window.open("index.html#" + this.item.Name);
 			};
 			c.appendChild(div);
 		}
@@ -81,19 +87,17 @@ window.onload = function() {
 			var item = items[i];
 			var div = create("div");
 			div.className = "item";
-			var img = item.url;
-			img = img.replace(".jpg", ".png");
-			img = img.replace("images", "images_png");
+			var img = item.Image;
 			div.style.backgroundImage = "url(" + img + ")";
 			div.style.backgroundPosition = "center center";
 			var cc = create("div");
 			div.style.display = "inline-block";
 			div.style.width = "175px";
 			div.style.height = "175px";
-			div.innerHTML = item.seimai + "<br>" + addComma(item.val * 180) + "yen/gou";
+			div.innerHTML = item.SeimaiBuai + "<br>" + addComma(item.val * 180) + "yen/gou";
 			div.item = item;
 			div.onclick = function() {
-				window.open("index.html#" + this.item.name);
+				window.open("index.html#" + this.item.Name);
 			};
 			c2.appendChild(div);
 		}

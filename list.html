@@ -6,88 +6,18 @@
 <script src="fukuno.js"></script>
 <script>"use strict";
 
-var show = function(items) {
-	var c = main;
-	clear(c);
-	
-	for (var i = 0; i < items.length; i++) {
-		var item = items[i];
-		var div = create("div");
-		div.className = "item";
-		var img = item.Photo;
-		div.style.backgroundImage = "url(" + img + ")";
-		var cc = create("div");
-		
-		var d2 = create("div");
-		d2.className = "name";
-		var name = item["Name@ja"];
-		if (getLanguage() != "ja" && item.Name)
-			name = item.Name;
-		d2.textContent = name;
-		d2.onclick = function() {
-			document.location.hash = encodeURIComponent(this.textContent);
-		};
-		div.appendChild(d2);
-		
-		cc.className = "c";
-		var head = [ [ "info", "Info@ja" ], [ "seimai", "SeimaiBuai" ], [ "award", "Awards@ja" ] ];
-		for (var j = 0; j < head.length; j++) {
-			var h = head[j];
-			var d2 = create("div");
-			d2.className = h[0];
-			h = h[1];
-			var s = item[h];
-			if (!s)
-				s = "";
-			s = s.replace(/\n/g, "<br>");
-			if (h == "SeimaiBuai") {
-				if (getLanguage() != "ja") {
-					s = "Seimai Buai: " + s;
-				} else {
-					s = "精米歩合: " + s;
-				}
-			}
-			d2.innerHTML = s;
-			cc.appendChild(d2);
-		}
-		// price
-		{
-			var d2 = create("div");
-			d2.className = "price";
-			var s = "";
-			for (var name in item) {
-				if (name.startsWith("Price_")) {
-					var price = item[name];
-					if (getLanguage() == "ja") {
-						s += name.substring(6) + ": " + addComma(price) + "円<br>";
-					} else {
-						s += name.substring(6) + ": " + addComma(price) + "yen<br>";
-					}
-				}
-			}
-			d2.innerHTML = s;
-			cc.appendChild(d2);
-		}
-		
-		div.appendChild(cc);
-		c.appendChild(div);
-	}
-};
-
-var sortByPrice = function(items) {
-};
-
 window.onload = function() {
 	getJSON("data-born.json", function(items) {
-//		dump(items);
-//		sortByPrice(items);
+		dump(items);
+		var c = main;
+		shuffle(items);
 		
 		var hash = decodeURIComponent(document.location.hash);
 		if (hash.length > 1) {
 			hash = hash.substring(1);
 		}
 		for (var i = 0; i < items.length; i++) {
-			if (items[i]["Name@ja"] == hash || items[i]["Name"] == hash) {
+			if (items[i].name == hash || items[i].name_en == hash) {
 				var item = items[i];
 				items.splice(i, 1);
 				items.unshift(item);
@@ -95,12 +25,52 @@ window.onload = function() {
 			}
 		}
 		
-		show(items);
-		
-		get("shuffle").onclick = function() {
-			shuffle(items);
-			show(items);
-		};
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			var div = create("div");
+			div.className = "item";
+			var img = item.url;
+			div.style.backgroundImage = "url(" + img + ")";
+			var cc = create("div");
+			
+			var d2 = create("div");
+			d2.className = "name";
+			var name = item.name;
+			if (getLanguage() != "ja" && item.name_en)
+				name = item.name_en;
+			d2.textContent = name;
+			d2.onclick = function() {
+				document.location.hash = encodeURIComponent(this.textContent);
+			};
+			div.appendChild(d2);
+			
+			cc.className = "c";
+			var head = [ "info", "seimai", "money", "award" ];
+			for (var j = 0; j < head.length; j++) {
+				var h = head[j];
+				var d2 = create("div");
+				d2.className = h;
+				var s = item[h];
+				if (!s)
+					s = "";
+				var s = s.replace(/\n/g, "<br>");
+				if (h == "money" && getLanguage() != "ja") {
+					s = s.replace(/([0-9\,]+)円/g, "¥$1");
+					s = s.replace(/税/g, "Tax");
+				}
+				if (h == "seimai") {
+					if (getLanguage() != "ja") {
+						s = "Seimai Buai: " + s;
+					} else {
+						s = "精米歩合: " + s;
+					}
+				}
+				d2.innerHTML = s;
+				cc.appendChild(d2);
+			}
+			div.appendChild(cc);
+			c.appendChild(div);
+		}
 	});
 };
 
@@ -136,8 +106,7 @@ body {
 	font-weight: bold;
 	background-color: rgba(255, 255, 255, .8);
 	padding-top: 20px;
-	x-padding-left: 10%;
-	margin-left: 30%;
+	padding-left: 10%;
 }
 .item .c {
 	overflow: scroll;
@@ -149,7 +118,7 @@ body {
 	margin: 10px;
 	background-color: rgba(255, 255, 255, .8);
 }
-.item .price {
+.item .money {
 	font-size: 90%;
 	margin: 10px;
 	background-color: rgba(255, 255, 255, .8);
@@ -176,20 +145,11 @@ a {
 
 <div id="main">
 </div>
-<button id=shuffle>シャッフル！</button>
-
-<div id=links>
-links<br>
-- <a href=index.html>梵 商品一覧</a><br>
-- <a href=mapping.html>梵 精米歩合-価格マッピング</a><br>
-- <a href=http://fukuno.jig.jp/app/csv/csvviewer.html#https://codeforfukui.github.io/born/data-born.csv#utf-8 target=_blank>梵オープンデータ（表形式表示）</a><br>
-</div>
 
 <div id=src>
 	DATA: <a href=data-born.json>Born Sake Open Data / 梵 日本酒オープンデータ</a> <a href=https://creativecommons.org/licenses/by/4.0/deed.ja>CC BY</a> <a href=http://www.born.co.jp/>Born / 梵</a><br>
 	APP: CC BY <a href=http://fukuno.jig.jp/1703 target=_blank>福野泰介の一日一創</a> (<a href=https://github.com/codeforfukui/born>src on GitHub</a>)<br>
 </div>
-
 
 </body>
 </html>

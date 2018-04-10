@@ -4,9 +4,9 @@ var STATIC_CACHE_NAME = 'static_' + VERSION;
 var ORIGIN = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
 
 var STATIC_FILES = [
-	ORIGIN + '/',
-	ORIGIN + '/fukuno.js',
-	ORIGIN + '/data-born.json'
+	ORIGIN + '/born/',
+	ORIGIN + '/born/fukuno.js',
+	ORIGIN + '/born/data-born.json'
 ];
 for (var i = 1; i <= 25; i++) {
 	STATIC_FILES.push("https://codeforfukui.github.io/born/images/" + i + ".jpg");
@@ -17,6 +17,7 @@ STATIC_FILES.forEach(function(x) { STATIC_FILE_URL_HASH[x] = true; });
 self.addEventListener('install', function(evt) {
 	evt.waitUntil(caches.open(STATIC_CACHE_NAME).then(function(cache) {
 		return Promise.all(STATIC_FILES.map(function(url) {
+//			console.log(url);
 			return fetch(new Request(url)).then(function(response) {
 				if (response.ok)
 					return cache.put(response.url, response);

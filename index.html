@@ -79,7 +79,7 @@ var sortByPrice = function(items) {
 };
 
 window.onload = function() {
-//	navigator.serviceWorker.register("serviceworker.js", { scope: "./" });
+	navigator.serviceWorker.register("serviceworker.js", { scope: "./" });
 	
 	getJSON("data-born.json", function(items) {
 //		dump(items);

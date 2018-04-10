@@ -5,7 +5,8 @@ var addCache = function(url) {
 		return fetch(new Request(url)).then(function(response) {
 			if (response.ok) {
 //				console.log("ok!");
-				cache.put(response.url, response);
+				var res2cache = response.clone();
+				cache.put(response.url, rescache);
 				evt.respondWith(response);
 			} else {
 //				console.log("NG...");

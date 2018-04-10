@@ -1,40 +1,46 @@
-const CACHE_NAME = "born_cache";
+var VERSION = 1;
+var STATIC_CACHE_NAME = 'static_' + VERSION;
 
-var addCache = function(url) {
-	caches.open(CACHE_NAME).then(function(cache) {
-		return fetch(new Request(url)).then(function(response) {
-			if (response.ok) {
-//				console.log("ok!");
-				var res2cache = response.clone();
-				cache.put(response.url, rescache);
-				evt.respondWith(response);
-			} else {
-//				console.log("NG...");
-//				return Promise.reject('Invalid response. URL:' + response.url + ' Status: ' + response.status);
-			}
-		});
-	});
-};
+var ORIGIN = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
 
-self.addEventListener("fetch", function(evt) {
-	caches.keys().then(function(keys) {
+var STATIC_FILES = [
+	ORIGIN + '/',
+	ORIGIN + '/fukuno.js',
+	ORIGIN + '/data-born.json'
+];
+for (var i = 1; i <= 25; i++) {
+	STATIC_FILES.push("https://codeforfukui.github.io/born/images/" + i + ".jpg");
+}
+var STATIC_FILE_URL_HASH = {};
+STATIC_FILES.forEach(function(x) { STATIC_FILE_URL_HASH[x] = true; });
+
+self.addEventListener('install', function(evt) {
+	evt.waitUntil(caches.open(STATIC_CACHE_NAME).then(function(cache) {
+		return Promise.all(STATIC_FILES.map(function(url) {
+			return fetch(new Request(url)).then(function(response) {
+				if (response.ok)
+					return cache.put(response.url, response);
+				return Promise.reject("Invalid res " + response.url + " " + response.status);
+			});
+		}));
+	}));
+});
+
+self.addEventListener('fetch', function(evt) {
+	if (!STATIC_FILE_URL_HASH[evt.request.url])
+		return;
+	var res = caches.match(evt.request, { cacheName: STATIC_CACHE_NAME });
+	evt.respondWith(res);
+});
+ 
+self.addEventListener('activate', function(evt) {
+	evt.waitUntil(caches.keys().then(function(keys) {
 		var promises = [];
 		keys.forEach(function(cacheName) {
-			promises.push(caches.delete(cacheName));
+			if (cacheName != STATIC_CACHE_NAME)
+				promises.push(caches.delete(cacheName));
 		});
 		return Promise.all(promises);
-	});
-	
-	return;
-	
-	var url = evt.request.url;
-//	console.log("URL: " + url);
-	var res = caches.match(evt.request, { cacheName: CACHE_NAME })
-	if (res) {
-//		console.log("cache hit!");
-		evt.respondWith(res);
-	} else {
-//		console.log("no hit!");
-		addCache(url);
-	}
+	}));
 });
+

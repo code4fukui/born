@@ -17,6 +17,16 @@ var addCache = function(url) {
 };
 
 self.addEventListener("fetch", function(evt) {
+	caches.keys().then(function(keys) {
+		var promises = [];
+		keys.forEach(function(cacheName) {
+			promises.push(caches.delete(cacheName));
+		});
+		return Promise.all(promises);
+	});
+	
+	return;
+	
 	var url = evt.request.url;
 //	console.log("URL: " + url);
 	var res = caches.match(evt.request, { cacheName: CACHE_NAME })

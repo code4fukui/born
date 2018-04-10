@@ -3,6 +3,7 @@
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 <meta property="og:image" content="ss.jpg">
 <link rel="apple-touch-icon" href="icon2.png">
+<link rel="manifest" href="manifest.json">
 <script src="fukuno.js"></script>
 <script>"use strict";
 
@@ -78,6 +79,8 @@ var sortByPrice = function(items) {
 };
 
 window.onload = function() {
+	navigator.serviceWorker.register("serviceworker.js", { scope: "./" });
+	
 	getJSON("data-born.json", function(items) {
 //		dump(items);
 //		sortByPrice(items);
